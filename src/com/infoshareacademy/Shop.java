@@ -16,6 +16,69 @@ public class Shop {
     private Integer maxChoiceNumber;
 
 
+
+
+    public Shop (Integer maxParkingCapacity, Set<String> acceptedVehicleTypes) {
+        this.maxParkingCapacity = maxParkingCapacity;
+        this.acceptedVehicleTypes = acceptedVehicleTypes;
+    }
+
+
+
+    public void shopRun () {
+        //createStartingVehicles();
+
+
+        Boolean menuContinue = true;
+        while (menuContinue) {
+
+            displayMenuBeginning();
+            displayVehicles();
+            displayMenu();
+
+            switch (getIntegerFromkeyboard(5)) {
+                case 1:
+                    Integer choiceAdd = displayAddToSaleSubmenu();
+                    Vehicle vehicle = createNewVehicle(choiceAdd);
+                    addNewVehicleForSale(vehicle);
+                    clearScreen();
+                    break;
+                case 2:
+                    Integer choiceRemove = displayRemoveFromSaleSubmenu(forSaleDB.size());
+                    removeVehicleFromSale(choiceRemove - 1);
+                    clearScreen();
+                    break;
+                case 3:
+                    Integer choiceSell = displaySaleSubmenu(forSaleDB.size());
+                    saleVehicle(choiceSell - 1);
+                    clearScreen();
+                    break;
+                case 4:
+                    Integer choiceOut = displayVehicleOutSubmenu(forSaleDB.size());
+                    removeVehicleFromSold(choiceOut - 1);
+                    clearScreen();
+                    break;
+                case 5:
+                    menuContinue = false;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     public Vehicle createNewVehicle (Integer choice) {
         if (choice == 1) {
             return new Car("Car");
@@ -29,7 +92,6 @@ public class Shop {
             return  new Bike("Bike");
         }
     }
-
 
     public void addNewVehicleForSale (Vehicle vehicle) {
         if (isVehicleTypeValid(vehicle)) {
@@ -85,10 +147,6 @@ public class Shop {
 
 
 
-    public Shop (Integer maxParkingCapacity, Set<String> acceptedVehicleTypes) {
-        this.maxParkingCapacity = maxParkingCapacity;
-        this.acceptedVehicleTypes = acceptedVehicleTypes;
-    }
 
 
     public Boolean isVehicleTypeValid (Vehicle vehicle) {
