@@ -8,38 +8,102 @@ public class ShoppingCentre {
     private final Random random = new Random();
     private final Integer maxCarAmount = 15;
     private Integer shopsAmount;
-    private Integer maxVehicleAmount;
+    private Integer shopNumber = 0;
     private List<Shop> shopsDB = new ArrayList<>();
 
 
     public static void main( String[] args ) {
         ShoppingCentre shoppingCentre = new ShoppingCentre();
-
-
-
-        for (int i = 0; i < shoppingCentre.shopsAmount; i++) {
-            shoppingCentre.shopsDB.add(shoppingCentre.createRandomShop());
-        }
-
-
-
-
-        Shop shop = shoppingCentre.shopsDB.get(0);
-        shop.shopRun();
-
-       // shoppingCentre.clearScreen();
-
-
+        shoppingCentre.createShoppingCentre();
     }
 
+    private void createShoppingCentre() {
+        displayConfigurationMenu();
 
-    private Shop createRandomShop() {
+        for (int i = 0; i < shopsAmount; i++) {
+            shopsDB.add(createRandomShop(i));
+        }
+
+        while (shopNumber != (shopsAmount + 1)) {
+            shopSelectMenu();
+
+            Boolean notProperShopNumber = true;
+            while (notProperShopNumber) {
+                System.out.print("Podaj numer sklepu (max. " + shopsAmount + "): ");
+                shopNumber = getKeyboardNumber();
+
+                if ((shopNumber < (shopsAmount + 2)) && (shopNumber > 0)) {
+                    notProperShopNumber = false;
+                }
+            }
+
+            if (shopNumber != (shopsAmount + 1)) {
+                clearScreen();
+                shopsDB.get(shopNumber - 1).shopRun();
+           }
+
+        }
+        System.out.println("Wyszedłeś z cetrum handlowego.");
+        System.out.println("Koniec działania programu.");
+    }
+
+    private void displayConfigurationMenu() {
+        System.out.println("*******************************************************************************************");
+        System.out.println("* Konfiguracja Centrum Handlowego");
+        System.out.print("* Podaj liczbę sklepów: ");
+        shopsAmount = getKeyboardNumber();
+        System.out.println("*");
+        System.out.println("* Każdy sklep posiadać będzie parkingi umożliwiające umieszczenie od 5 do 15 pojazdów.");
+        System.out.println("*");
+        System.out.println("* Naciśnij dowolny klawisz aby wygenerować Centrum Handlowe.");
+        System.out.print("*******************************************************************************************");
+
+        Scanner scanner = new Scanner(System.in);
+        String in = scanner.nextLine();
+    }
+
+    private void shopSelectMenu() {
+        System.out.println("*******************************************************************************************");
+        System.out.println("Liczba sklepów z różnego rodzaju pojazdami znajdujących się w Centrum Handlowym: " + shopsAmount);
+        System.out.println("Podaj numer sklepu, do którego chcesz wejść. ");
+        System.out.println("Wskazanie liczby " + (shopsAmount + 1) + " spowoduje wyjście z Centrum Handlowego.");
+        System.out.println();
+    }
+
+    public Integer getShopNumber () {
+        return shopNumber;
+    }
+
+    private static Integer getKeyboardNumber() {
+        Boolean notValidChoice = true;
+        Integer choice = 0;
+
+        while (notValidChoice) {
+            try {
+                Scanner scanner = new Scanner(System.in);
+                choice = scanner.nextInt();
+
+                if (choice > 0 ) {
+                    notValidChoice = false;
+                } else {
+                    System.out.print("Podaj liczbę > 0: ");
+                    notValidChoice = true;
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Podaj liczbę.");
+                notValidChoice = true;
+            }
+        }
+        return  choice;
+    }
+
+    private Shop createRandomShop(Integer number) {
         Integer carLimit = generateMaxParkingCapacity();
         Set<String> set = new HashSet<>();
         set = generateAcceptedVehicleTypes();
-        Shop shop = new Shop(carLimit, set);
-        for (int i = 0; i < carLimit; i++) {
+        Shop shop = new Shop(carLimit, set, number);
 
+        for (int i = 0; i < carLimit; i++) {
             Boolean result = true;
             while (result) {
                 Object o = generateVehicle();
@@ -47,10 +111,10 @@ public class ShoppingCentre {
                 String s = c.getSimpleName();
 
                 if (set.contains(s)) {
-                    result = true;
-                } else {
-                    shop.forSaleDB.add(generateVehicle());
+                    shop.forSaleDB.add((Vehicle) o);
                     result = false;
+                } else {
+                    result = true;
                 }
             }
         }
@@ -64,45 +128,34 @@ public class ShoppingCentre {
                 String s = c.getSimpleName();
 
                 if (set.contains(s)) {
-                    result = true;
-                } else {
-                    shop.soldDB.add(generateVehicle());
+                    shop.soldDB.add((Vehicle) o);
                     result = false;
+                } else {
+                    result = true;
                 }
             }
         }
         return shop;
     }
 
-    private List<Shop> createRandomShops(Integer shopsAmount) {
-        List<Shop> list = new ArrayList<>();
-
-        for (int i =0; i < shopsAmount; i++) {
-            list.add(createRandomShop());
-        }
-        return list;
-    }
-
     private Set<String> generateAcceptedVehicleTypes() {
        // Random random = new Random();
 
         Set<String> list = new HashSet<>();
-        String[] types = {"Car", "Boat", "Plain", "Tank", "Bike"};
+        String[] types = {"Car", "Boat", "Plane", "Tank", "Bike"};
         String vehicletype;
 
         while (list.size() < 3) {
             vehicletype = types[random.nextInt(types.length)];
             list.add(vehicletype);
         }
-
-        System.out.println(list);
         return list;
     }
 
     private Integer generateMaxParkingCapacity() {
         Integer maxParkingCapacity = 0;
 
-        while (maxParkingCapacity < 5) {
+        while (maxParkingCapacity < 5 || maxParkingCapacity > maxCarAmount) {
             maxParkingCapacity = random.nextInt(maxCarAmount);
         }
         return maxParkingCapacity;
@@ -126,56 +179,19 @@ public class ShoppingCentre {
         }
     }
 
-    private void displayConfigurationMenu() {
-        System.out.println("*******************************************************************************************");
-        System.out.println("Konfiguracja centrum handlowego");
-        System.out.print("* Podaj liczbę sklepów: ");
-
-        shopsAmount = getKeyboardNumber();
-
-        System.out.print("* Podaj maksymalną liczbę pojazdów w sklepie: ");
-
-        Integer maxVehicleAmount = getKeyboardNumber();
-
-        System.out.print("* Naciśnij dowolny klawisz aby wygenerowac centrum handlowe.");
-    }
-
-    public static Integer getKeyboardNumber() {
-        Boolean notValidChoice = true;
-        Integer choice = 0;
-
-        while (notValidChoice) {
-            try {
-                Scanner scanner = new Scanner(System.in);
-                choice = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.println("Podaj liczbę.");
-                notValidChoice = true;
-            }
-        }
-        return  choice;
-    }
-
     private void clearScreen() {
         try
         {
             final String os = System.getProperty("os.name");
 
-            if (os.contains("Windows"))
-            {
+            if (os.contains("Windows")) {
                 Runtime.getRuntime().exec("cls");
-            }
-            else
-            {
+            } else {
                 Runtime.getRuntime().exec("clear");
             }
         }
-        catch (final Exception e)
-        {
+        catch (final Exception e) {
             System.out.println("Clear / CLS error");
         }
     }
-
-
-
 }
