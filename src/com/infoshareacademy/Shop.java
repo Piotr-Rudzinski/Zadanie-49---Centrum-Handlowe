@@ -27,25 +27,31 @@ public class Shop {
             displayVehicles();
             displayMenu();
 
-            switch (getIntegerFromkeyboard(5)) {
+            switch (getIntegerFromKeyboard(5)) {
                 case 1:
-                    Integer choiceAdd = displayAddToSaleSubmenu();
+                    displayAddToSaleSubmenu();
+
+
+                    Integer choiceAdd = getIntegerFromKeyboard(5);
                     Vehicle vehicle = createNewVehicle(choiceAdd);
                     addNewVehicleForSale(vehicle);
                     clearScreen();
                     break;
                 case 2:
-                    Integer choiceRemove = displayRemoveFromSaleSubmenu(carsForSaleDB.size());
+                    System.out.print("2. Usuń pojazd ze sprzedaży - podaj numer pojazdu: ");
+                    Integer choiceRemove = getIntegerFromKeyboard(carsForSaleDB.size());
                     removeVehicleFromSale(choiceRemove - 1);
                     clearScreen();
                     break;
                 case 3:
-                    Integer choiceSell = displaySaleSubmenu(carsForSaleDB.size());
+                    System.out.print("3. Sprzedaj pojazd - podaj numer pojazdu: ");
+                    Integer choiceSell = getIntegerFromKeyboard(carsForSaleDB.size());
                     saleVehicle(choiceSell - 1);
                     clearScreen();
                     break;
                 case 4:
-                    Integer choiceOut = displayVehicleOutSubmenu(carsForSaleDB.size());
+                    System.out.print("4. Wydaj pojazd klientowi - podaj numer pojazdu: ");
+                    Integer choiceOut = getIntegerFromKeyboard(carsForSaleDB.size());
                     removeVehicleFromSold(choiceOut - 1);
                     clearScreen();
                     break;
@@ -247,7 +253,7 @@ public class Shop {
         System.out.print("Podaj numer polecenia: ");
     }
 
-    private Integer displayAddToSaleSubmenu() {
+    private void displayAddToSaleSubmenu() {
         System.out.println("1. Dodaj pojazd do sprzedaży - podaj typ pojazdu wskazując cyfrę od 1 do 5");
         System.out.println("   1. Car");
         System.out.println("   2. Boat");
@@ -255,26 +261,9 @@ public class Shop {
         System.out.println("   4. Tank");
         System.out.println("   5. Bike");
         System.out.print("Typ pojazdu: ");
-
-        return getIntegerFromkeyboard(5);
     }
 
-    private Integer displayRemoveFromSaleSubmenu(Integer maxChoiceNumber) {
-        System.out.print("2. Usuń pojazd ze sprzedaży - podaj numer pojazdu: ");
-        return getIntegerFromkeyboard(maxChoiceNumber);
-    }
-
-    private Integer displaySaleSubmenu(Integer maxChoiceNumber) {
-        System.out.print("3. Sprzedaj pojazd - podaj numer pojazdu: ");
-        return getIntegerFromkeyboard(maxChoiceNumber);
-    }
-
-    private Integer displayVehicleOutSubmenu(Integer maxChoiceNumber) {
-        System.out.print("4. Wydaj pojazd klientowi - podaj numer pojazdu: ");
-        return getIntegerFromkeyboard(maxChoiceNumber);
-    }
-
-    private Integer getIntegerFromkeyboard(Integer maxChoiceNumber) {
+    private Integer getIntegerFromKeyboard(Integer maxChoiceNumber) {
         Boolean notValidChoice = true;
         Integer choice = 0;
 
