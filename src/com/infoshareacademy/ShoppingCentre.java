@@ -4,6 +4,7 @@ import com.infoshareacademy.vehicles.*;
 
 import java.util.*;
 
+
 public class ShoppingCentre {
     private final Random random = new Random();
     private final Integer maxCarAmount = 15;
@@ -18,7 +19,10 @@ public class ShoppingCentre {
     }
 
     private void createShoppingCentre() {
-        displayConfigurationMenu();
+        displayConfigurationMenuBeginning();
+        shopsAmount = getKeyboardNumber();
+        displayConfigurationMenuEnd();
+        getAnyKey();
 
         for (int i = 0; i < shopsAmount; i++) {
             shopsDB.add(createRandomShop(i));
@@ -47,19 +51,18 @@ public class ShoppingCentre {
         System.out.println("Koniec działania programu.");
     }
 
-    private void displayConfigurationMenu() {
+    private void displayConfigurationMenuBeginning() {
         System.out.println("*******************************************************************************************");
         System.out.println("* Konfiguracja Centrum Handlowego");
         System.out.print("* Podaj liczbę sklepów: ");
-        shopsAmount = getKeyboardNumber();
+    }
+
+    private void displayConfigurationMenuEnd() {
         System.out.println("*");
         System.out.println("* Każdy sklep posiadać będzie parkingi umożliwiające umieszczenie od 5 do 15 pojazdów.");
         System.out.println("*");
         System.out.println("* Naciśnij dowolny klawisz aby wygenerować Centrum Handlowe.");
         System.out.print("*******************************************************************************************");
-
-        Scanner scanner = new Scanner(System.in);
-        String in = scanner.nextLine();
     }
 
     private void shopSelectMenu() {
@@ -68,6 +71,11 @@ public class ShoppingCentre {
         System.out.println("Podaj numer sklepu, do którego chcesz wejść. ");
         System.out.println("Wskazanie liczby " + (shopsAmount + 1) + " spowoduje wyjście z Centrum Handlowego.");
         System.out.println();
+    }
+
+    private void getAnyKey() {
+        Scanner scanner = new Scanner(System.in);
+        String in = scanner.nextLine();
     }
 
     public Integer getShopNumber () {
@@ -103,24 +111,16 @@ public class ShoppingCentre {
         set = generateAcceptedVehicleTypes();
         Shop shop = new Shop(carLimit, set, number);
 
-        for (int i = 0; i < carLimit; i++) {
-            Boolean result = true;
-            while (result) {
-                Object o = generateVehicle();
-                Class c = o.getClass();
-                String s = c.getSimpleName();
-
-                if (set.contains(s)) {
-                    shop.forSaleDB.add((Vehicle) o);
-                    result = false;
-                } else {
-                    result = true;
-                }
-            }
-        }
+        filParkingWithWehicles(shop, shop.getCarsForSaleDB(), "carsForSaleDB", set, carLimit );
 
         Integer soldLimit = random.nextInt(carLimit);
-        for (int i = 0; i < soldLimit; i++) {
+        filParkingWithWehicles(shop, shop.getSoldCarsDB(), "soldCarsDB", set, soldLimit );
+
+        return shop;
+    }
+
+    private void filParkingWithWehicles(Shop shop, List<Vehicle> parkingDB, String parkingName,Set<String> set, Integer limit) {
+        for (int i = 0; i < limit; i++) {
             Boolean result = true;
             while (result) {
                 Object o = generateVehicle();
@@ -128,15 +128,25 @@ public class ShoppingCentre {
                 String s = c.getSimpleName();
 
                 if (set.contains(s)) {
-                    shop.soldDB.add((Vehicle) o);
+                    if (parkingName.equals("soldCarsDB")) {
+                        shop.getCarsForSaleDB().add((Vehicle) o);
+                    } else {
+                        shop.getSoldCarsDB().add((Vehicle) o);
+                    }
                     result = false;
                 } else {
                     result = true;
                 }
             }
         }
-        return shop;
     }
+
+
+
+
+
+
+
 
     private Set<String> generateAcceptedVehicleTypes() {
        // Random random = new Random();

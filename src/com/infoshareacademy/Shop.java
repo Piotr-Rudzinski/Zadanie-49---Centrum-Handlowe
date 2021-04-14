@@ -4,13 +4,15 @@ import com.infoshareacademy.vehicles.*;
 
 import java.util.*;
 
+
 public class Shop {
-    public List<Vehicle> forSaleDB = new ArrayList<>();
-    public List<Vehicle> soldDB = new ArrayList<>();
+    private List<Vehicle> carsForSaleDB = new ArrayList<>();
+    private List<Vehicle> soldCarsDB = new ArrayList<>();
     private Integer maxParkingCapacity;
     private Set<String> acceptedVehicleTypes = new HashSet<>();
     private Integer maxChoiceNumber;
     private Integer shopNumber;
+    private final String os = System.getProperty("os.name");
 
     public Shop(Integer maxParkingCapacity, Set<String> acceptedVehicleTypes, Integer shopNumber) {
         this.maxParkingCapacity = maxParkingCapacity;
@@ -33,17 +35,17 @@ public class Shop {
                     clearScreen();
                     break;
                 case 2:
-                    Integer choiceRemove = displayRemoveFromSaleSubmenu(forSaleDB.size());
+                    Integer choiceRemove = displayRemoveFromSaleSubmenu(carsForSaleDB.size());
                     removeVehicleFromSale(choiceRemove - 1);
                     clearScreen();
                     break;
                 case 3:
-                    Integer choiceSell = displaySaleSubmenu(forSaleDB.size());
+                    Integer choiceSell = displaySaleSubmenu(carsForSaleDB.size());
                     saleVehicle(choiceSell - 1);
                     clearScreen();
                     break;
                 case 4:
-                    Integer choiceOut = displayVehicleOutSubmenu(forSaleDB.size());
+                    Integer choiceOut = displayVehicleOutSubmenu(carsForSaleDB.size());
                     removeVehicleFromSold(choiceOut - 1);
                     clearScreen();
                     break;
@@ -86,7 +88,7 @@ public class Shop {
     }
 
     private void removeVehicleFromSale(Integer i) {
-        if (!forSaleDB.isEmpty()) {
+        if (!carsForSaleDB.isEmpty()) {
             removeVehicleForSale(i);
         } else {
             System.out.print("Ten pojazd nie jest w sprzedaży. Naciśnij dowolny klawisz.");
@@ -96,7 +98,7 @@ public class Shop {
 
     private void saleVehicle(Integer i) {
         if (isPlaceOnSoldParking()) {
-            Vehicle vehicle = forSaleDB.get((int) i);
+            Vehicle vehicle = carsForSaleDB.get((int) i);
             removeVehicleForSale((int) i);
             addSoldVehicle(vehicle);
             System.out.print("Pojazd został przesunięty z listy pojazdów przeznaczonych do sprzedazy do listy pojazdów sprzedanych. Naciśnij dowolny klawisz.");
@@ -107,7 +109,7 @@ public class Shop {
     }
 
     private void removeVehicleFromSold(Integer i) {
-        if (!soldDB.isEmpty()) {
+        if (!soldCarsDB.isEmpty()) {
             removeSoldVehicle(i);
             System.out.print("Pojazd został wydany klientowi. Naciśnij dowolny klawisz.");
         } else {
@@ -127,43 +129,35 @@ public class Shop {
     }
 
     private Boolean isPlaceOnSaleParking() {
-        if (forSaleDB.size() < maxParkingCapacity) {
-            return true;
-        } else {
-            return false;
-        }
+        return (carsForSaleDB.size() < maxParkingCapacity);
     }
 
     private Boolean isPlaceOnSoldParking() {
-        if (soldDB.size() < maxParkingCapacity) {
-            return true;
-        } else {
-            return false;
-        }
+        return (soldCarsDB.size() < maxParkingCapacity);
     }
 
     private void addVehicleForSale(Vehicle vehicle) {
-        forSaleDB.add(vehicle);
+        carsForSaleDB.add(vehicle);
     }
 
     private void addSoldVehicle(Vehicle vehicle) {
-        soldDB.add(vehicle);
+        soldCarsDB.add(vehicle);
     }
 
     private void removeVehicleForSale(Integer position) {
-        forSaleDB.remove((int) position);
+        carsForSaleDB.remove((int) position);
         System.out.print("Pojazd został usunięty. Naciśnij dowolny klawisz.");
     }
 
     private void removeSoldVehicle(Integer position) {
-        soldDB.remove((int) position);
+        soldCarsDB.remove((int) position);
     }
 
     private void displayVehicles() {
         Integer tableLength = getTableLength();
 
         System.out.println("----------------------------------------------------------");
-        System.out.println("| Lp. | Pojazdy do sprzedaży   | Pojazdy sprzedane       |");
+        System.out.println("| Lp. | Pojazdy do sprzedaży    | Pojazdy sprzedane      |");
         System.out.println("----------------------------------------------------------");
 
         for (int i = 0; i < getTableLength(); i++) {
@@ -185,52 +179,46 @@ public class Shop {
         stringBuilder.append(" | ");
 
         try {
-            s = getVehicleObjectSimpleName(forSaleDB.get(i));
+            s = getVehicleObjectSimpleName(carsForSaleDB.get(i));
         } catch (IndexOutOfBoundsException e) {
             s = "noVehicleTypeClass";
         }
 
-        if (s.equals("Car")) {
-            stringBuilder.append("Car                    | ");
-        } else if (s.equals("Boat")) {
-            stringBuilder.append("Boat                   | ");
-        } else if (s.equals("Plane")) {
-            stringBuilder.append("Plane                  | ");
-        } else if (s.equals("Tank")) {
-            stringBuilder.append("Tank                   | ");
-        } else if (s.equals("Bike")) {
-            stringBuilder.append("Bike                   | ");
-        } else if (s.equals("noVehicleTypeClass")) {
-            stringBuilder.append(" -                     | ");
-        }
+        stringBuilder.append(generateTableLine(s));
 
         try {
-            s = getVehicleObjectSimpleName(soldDB.get(i));
+            s = getVehicleObjectSimpleName(soldCarsDB.get(i));
         } catch (IndexOutOfBoundsException e) {
             s = "noVehicleTypeClass";
         }
 
-        if (s.equals("Car")) {
-            stringBuilder.append("Car                     |");
-        } else if (s.equals("Boat")) {
-            stringBuilder.append("Boat                    |");
-        } else if (s.equals("Plane")) {
-            stringBuilder.append("Plane                   |");
-        } else if (s.equals("Tank")) {
-            stringBuilder.append("Tank                    |");
-        } else if (s.equals("Bike")) {
-            stringBuilder.append("Bike                    |");
-        } else if (s.equals("noVehicleTypeClass")) {
-            stringBuilder.append(" -                      |");
-        } else {
-            stringBuilder.append(" -                      |");
-        }
+        stringBuilder.append(generateTableLine(s));
         return stringBuilder;
     }
 
+    private String generateTableLine (String s) {
+       String result;
+        if (s.equals("Car")) {
+            result = "Car                     |";
+        } else if (s.equals("Boat")) {
+            result = "Boat                    |";
+        } else if (s.equals("Plane")) {
+            result = "Plane                   |";
+        } else if (s.equals("Tank")) {
+            result = "Tank                    |";
+        } else if (s.equals("Bike")) {
+            result = "Bike                    |";
+        } else if (s.equals("noVehicleTypeClass")) {
+            result = " -                      |";
+        } else {
+            result = " -                      |";
+        }
+        return result;
+    }
+
     private Integer getTableLength() {
-        Integer length1 = forSaleDB.size();
-        Integer length2 = soldDB.size();
+        Integer length1 = carsForSaleDB.size();
+        Integer length2 = soldCarsDB.size();
 
         if (length1 > length2) {
             return length1;
@@ -317,8 +305,6 @@ public class Shop {
 
     private void clearScreen() {
         try {
-            final String os = System.getProperty("os.name");
-
             if (os.contains("Windows")) {
                 Runtime.getRuntime().exec("cls");
             } else {
@@ -327,5 +313,13 @@ public class Shop {
         } catch (final Exception e) {
             System.out.println("Clear / CLS error");
         }
+    }
+
+    public List<Vehicle> getCarsForSaleDB() {
+        return carsForSaleDB;
+    }
+
+    public List<Vehicle> getSoldCarsDB() {
+        return soldCarsDB;
     }
 }
